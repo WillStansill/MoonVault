@@ -1,13 +1,8 @@
 # Challenge
-- What is the problem that you are addressing?  Who is it a problem for?
+- Accessing all the certificate attestation data on BlockBadge by mentors.
 
 # Solution
-- What would an ideal solution look like? 
+- A button on moon wallet that allows mentors to export all the certificate attestations they have done into a CSV file.
 
 # Why it Matters
-- How does your solution impact your target audience?  Does it save time, make money, save money?
-
-## Examples
-- Homechain https://github.com/0xBcamp/March-2023-Lima
-- SmartVault https://github.com/0xBcamp/March-2023-Sierra
-- Blockbadge https://github.com/0xBcamp/Sept23_Apprenticeship_Certification
+- Saves time for mentors to be able to quickly extract certificate attestation into a CSV format.
