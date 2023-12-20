@@ -3,8 +3,8 @@
 
 # Solution
 - A download button on the BlockBadge site utilizing the Moon APIs to access and store all the data.
-
-- ![image](https://github.com/0xBcamp/Hobbes-janus-dragon/assets/44200959/35af4f0b-6824-4997-b881-d76a043830f7)
+- Basic proof of concept can look something simple like the concept below:
+![image](https://github.com/0xBcamp/Hobbes-janus-dragon/assets/44200959/35af4f0b-6824-4997-b881-d76a043830f7)
 
 
 # Why it Matters
