@@ -3,7 +3,7 @@
 
 # Solution
 - A download button on the BlockBadge site utilizing the Moon APIs to access and store all the data.
-- Use the Moon API and Moon Data to extract account details and corresponding 'Attest' transactions made by that account.
+- Use the Moon API and Moon Data to extract account details and corresponding 'Attest'method transactions made by that account.
 ![image](https://github.com/0xBcamp/Hobbes-janus-dragon/assets/44200959/20ecc679-e748-4435-8909-5a896fb44a71)
 
 - Basic proof of concept can look something simple like below. The button would simply save all of the data into a CSV and download it to the users machine:
