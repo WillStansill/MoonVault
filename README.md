@@ -1,5 +1,5 @@
 # Challenge
-- Accessing all the certificate attestation (NFT minting) done by an address on the BlockBadge site.
+- Accessing all the certificate attestation (NFT minting) done by an address on the BlockBadge site..
 
 # Solution
 - A download button on the BlockBadge site utilizing the Moon APIs to access and store all the data.
