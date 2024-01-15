@@ -1,0 +1,36 @@
+Slide 1
+Welcome to our team MoonVault, where we will shine a light on the complexities of the blockchain landscape.
+Our project is all about Blockchain, Data, Extraction but Simplified
+
+2 
+Let's meet our small, but mighty team. There is obviously me, presenting this to you right now, my name is Duy & and amazing my partner who is running the slides rn, Mr.Will Stansill 
+
+We are a part of Manraj aka Hobbs's team.
+We are really excited to get into the project. 
+
+3
+I want to present and explain a clear obstacle when it comes to on-chain data; it is difficult and time-consuming to access and compile the data you need. These hurdles are preventing you from analyzing and utilizing your precious data. 
+
+
+4
+But we are here with a solution for you; it is a ONE-CLICK-download button that collects all the data you need and automatically compiles it for you to download. 
+Ultimately saving you TONS of time, improving efficiency & and allowing you to focus on more important tasks. 
+
+5
+To implement this, we are utilizing a project that was created in the last cohort, which is called, Block Badge, a service that allows BCamp to give out certificates to participants. We will create a seamless and instant DATA, RETRIVAL option that collects & and aggregates all of the ATTESTATION which in this case are the certificates, into one CSV file while utilizing the Moon software development kit. 
+
+6
+This type of feature demonstrates that we can pull ANY data we need, when we NEED it.
+For this project, our main goal is to allow users to download attestation after signing in with the Moon Wallet. With the stretch goal of being able to download files just by putting in any address & and maybe even picking a date range for more accurate data selection.
+
+7
+Here is the current block badge website with the mock demo added of a download tab and a sign-in via Moon button at the bottom. As for the stretch goals
+
+8
+We got the search bar where u can input any address you want to extract data from, select a date range & and download the button of course. 
+
+9
+That will it for out presentation, lastly if you guys could follow us on X, that would be great we will try our best to keep you guys updated on our project journey, thank you so much for your attention, and please let us know if you have any questions, feel free post it on X & we ll get to it asap.
+
+
+
