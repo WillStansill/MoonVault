@@ -1,0 +1,11 @@
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out forwards;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* This adds some space between the buttons */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

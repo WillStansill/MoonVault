@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-
+// import React, { useEffect } from 'react';
+import './App.css';
+import React, { useState } from 'react';
 import { Network, Alchemy, AssetTransfersCategory } from 'alchemy-sdk';
 
 const settings = {
@@ -28,11 +29,35 @@ const main = async () => {
 
 main();
 
+// const App = () => {
+//     return (
+//         <div className="App">
+//             <h1>Connect Your Wallet</h1>
+//             <button>Download</button>
+//         </div>
+//     );
+// };
+
 const App = () => {
+    // State to control the visibility of the buttons
+    const [showButtons, setShowButtons] = useState(false);
+
+    const handleConnectClick = () => {
+        setShowButtons(true);
+    };
+
     return (
-        <div className="App">
-            <h1>Connect Your Wallet</h1>
-            <button>Download</button>
+        <div className="App" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <h1>Moon Vault Data Extraction</h1>
+            {!showButtons && (
+                <button onClick={handleConnectClick}>Connect Your Moon Wallet</button>
+            )}
+            {showButtons && (
+                <div className="fade-in">
+                    <button>Sign Up</button>
+                    <button>Sign In</button>
+                </div>
+            )}
         </div>
     );
 };
