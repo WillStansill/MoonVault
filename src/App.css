@@ -1,8 +1,52 @@
+.App {
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+}
+
+.App-header {
+    background-color: #282c34;
+    padding: 20px;
+    color: white;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.App-title {
+    font-size: 2.5rem; /* Makes the title larger */
+    margin: 0;
+}
+
+.App-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding-top: 60px; /* Adjust this value so that the content starts below the header */
+}
+
+.connect-button, .auth-button {
+    font-size: 1rem;
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.connect-button:hover, .auth-button:hover {
+    background-color: #ccc; /* Slight color change on hover */
+}
+
 .fade-in {
     animation: fadeIn 0.5s ease-in-out forwards;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* This adds some space between the buttons */
+    gap: 10px;
 }
 
 @keyframes fadeIn {

@@ -39,7 +39,6 @@ main();
 // };
 
 const App = () => {
-    // State to control the visibility of the buttons
     const [showButtons, setShowButtons] = useState(false);
 
     const handleConnectClick = () => {
@@ -47,17 +46,21 @@ const App = () => {
     };
 
     return (
-        <div className="App" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <h1>Moon Vault Data Extraction</h1>
-            {!showButtons && (
-                <button onClick={handleConnectClick}>Connect Your Moon Wallet</button>
-            )}
-            {showButtons && (
-                <div className="fade-in">
-                    <button>Sign Up</button>
-                    <button>Sign In</button>
-                </div>
-            )}
+        <div className="App">
+            <header className="App-header">
+                <h1 className="App-title">Moon Vault Data Extraction</h1>
+            </header>
+            <main className="App-content">
+                {!showButtons && (
+                    <button className="connect-button" onClick={handleConnectClick}>Connect Your Moon Wallet</button>
+                )}
+                {showButtons && (
+                    <div className="fade-in">
+                        <button className="auth-button">Sign Up</button>
+                        <button className="auth-button">Sign In</button>
+                    </div>
+                )}
+            </main>
         </div>
     );
 };
