@@ -1,3 +1,5 @@
+import React from 'react';
+import {useRouter} from 'next/router';
 import {
 	EmailLoginInput,
 	EmailSignupInput,
@@ -6,6 +8,7 @@ import { useState } from 'react';
 import { useMoonSDK } from './usemoonsdk';
 
 const SignupPage: React.FC = () => {
+	const router = useRouter();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
@@ -74,6 +77,8 @@ const SignupPage: React.FC = () => {
 				console.log('Signup successful:', signupResponse);
 
 				setSignupSuccess(true);
+
+				router.push('/home');
 			}
 		} catch (error) {
 			console.error('Error during signup:', error);
