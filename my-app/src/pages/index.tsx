@@ -1,276 +1,201 @@
-import React from 'react';
-import {useRouter} from 'next/router';
-import {
-	EmailLoginInput,
-	EmailSignupInput,
-} from '@moonup/moon-api';
-import { useState } from 'react';
-import { useMoonSDK } from './usemoonsdk';
+import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import { useMoonSDK } from './usemoonsdk'; // Adjust the path as necessary
+import { EmailLoginInput, EmailSignupInput } from '@moonup/moon-api';
 
 const SignupPage: React.FC = () => {
-	const router = useRouter();
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
-	const [passwordError, setPasswordError] = useState('');
-	const [signupSuccess, setSignupSuccess] = useState(false);
-	const [signInSuccess, setSignInSuccess] = useState(false);
-	const [authenticatedAddress, setAuthenticatedAddress] = useState('');
-	const [isConnected, setIsConnected] = useState(false);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [signupSuccess, setSignupSuccess] = useState(false);
+    const [signInSuccess, setSignInSuccess] = useState(false);
+    const [authenticatedAddress, setAuthenticatedAddress] = useState('');
+    const [isConnected, setIsConnected] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-	const { moon, connect, createAccount, disconnect, updateToken, initialize } =
-		useMoonSDK();
+    const { moon, connect, createAccount, disconnect, updateToken, initialize } = useMoonSDK();
 
-	const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setEmail(event.target.value);
-	};
+    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(event.target.value);
+    };
 
-	const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setPassword(event.target.value);
-	};
+    const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword(event.target.value);
+    };
 
-	const handleConfirmPasswordChange = (
-		event: React.ChangeEvent<HTMLInputElement>
-	) => {
-		setConfirmPassword(event.target.value);
-	};
+    const handleConfirmPasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setConfirmPassword(event.target.value);
+    };
 
-	const handleInitializeAndConnect = async () => {
-		try {
-			setLoading(true);
-			setError(null);
+    const handleInitializeAndConnect = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            await initialize();
+            await connect();
+            setIsConnected(true);
+        } catch (error) {
+            setError('Error connecting to Moon. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-			// Initialize and connect to Moon
-			console.log('Initializing and connecting to Moon...');
-			await initialize();
-			await connect();
-			console.log('Connected to Moon!');
-			setIsConnected(true);
+    const handleSignup = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            if (password !== confirmPassword) {
+                setPasswordError('Passwords do not match');
+                return;
+            }
+
+            const signupRequest: EmailSignupInput = { email, password };
+            const signupResponse = await moon?.getAuthSDK().emailSignup(signupRequest);
+            setSignupSuccess(true);
+			router.push(`/home?address=${encodeURIComponent(authenticatedAddress)}`);
 		} catch (error) {
-			console.error('Error during connection:', error);
-			setError('Error connecting to Moon. Please try again.');
-		} finally {
-			setLoading(false);
-		}
-	};
+            setError('Error signing up. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-	const handleSignup = async () => {
-		try {
-			setLoading(true);
-			setError(null);
+    const handleSignIn = async () => {
+        try {
+            setLoading(true);
+            setError(null);
 
-			if (password !== confirmPassword) {
-				setPasswordError('Passwords do not match');
-			} else {
-				setPasswordError('');
+            const loginRequest: EmailLoginInput = { email, password };
+            const loginResponse = await moon?.getAuthSDK().emailLogin(loginRequest);
 
-				// Sign up the user
-				const auth = moon.getAuthSDK();
-				const signupRequest: EmailSignupInput = {
-					email,
-					password,
-				};
-				console.log('Signing up...');
-				const signupResponse: any = await auth.emailSignup(signupRequest);
-				console.log('Signup successful:', signupResponse);
+            await updateToken(loginResponse.data.token, loginResponse.data.refreshToken);
+            moon?.MoonAccount.setEmail(email);
+            moon?.MoonAccount.setExpiry(loginResponse.data.expiry);
 
-				setSignupSuccess(true);
-
-				router.push('/home');
-			}
+            const newAccount = await createAccount();
+            setSignInSuccess(true);
+            setAuthenticatedAddress(newAccount.data.data.address);
+			router.push(`/home?address=${encodeURIComponent(newAccount.data.data.address)}`);
 		} catch (error) {
-			console.error('Error during signup:', error);
-			setError('Error signing up. Please try again.');
-		} finally {
-			setLoading(false);
-		}
-	};
+            setError('Error signing in. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-	const handleSignIn = async () => {
-		try {
-			setLoading(true);
-			setError(null);
+    const handleDisconnect = async () => {
+        try {
+            setLoading(true);
+            await disconnect();
+            setIsConnected(false);
+        } catch (error) {
+            setError('Error disconnecting from Moon. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-			// Authenticate the user and sign in
-			const auth = moon.getAuthSDK();
-			const loginRequest: EmailLoginInput = {
-				email,
-				password,
-			};
-			console.log('Authenticating...');
-			const loginResponse: any = await auth.emailLogin(loginRequest);
-			console.log('Authentication successful:', loginResponse);
+    return (
+        <div className="flex flex-col justify-center items-center h-screen bg-gray-50 px-4">
+            <div className="max-w-md w-full space-y-8">
+                <div>
+                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                        {isConnected ? (signupSuccess || signInSuccess) ? 'Welcome to Your Moon Account' : 'Create Your Moon Account' : 'Connect to Moon'}
+                    </h2>
+                    <p className="mt-2 text-center text-sm text-gray-600">
+                        {error && <span className="font-medium text-red-500">{error}</span>}
+                    </p>
+                </div>
+                {!isConnected && (
+                    <button
+                        type="button"
+                        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        onClick={handleInitializeAndConnect}
+                    >
+                        {loading ? 'Connecting...' : 'Initialize & Connect to Moon'}
+                    </button>
+                )}
 
-			// Set tokens and email
-			console.log('Updating tokens and email...');
-			await updateToken(
-				loginResponse.data.token,
-				loginResponse.data.refreshToken
-			);
-			moon.MoonAccount.setEmail(email);
-			moon.MoonAccount.setExpiry(loginResponse.data.expiry);
-			console.log('Tokens and email updated!');
+                {isConnected && !signupSuccess && !signInSuccess && (
+                    <>
+                        <div className="mt-8">
+                            <div className="rounded-md shadow-sm">
+                                <div>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={email}
+                                        onChange={handleEmailChange}
+                                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                        placeholder="Email"
+                                    />
+                                </div>
+                                <div className="-space-y-px">
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        value={password}
+                                        onChange={handlePasswordChange}
+                                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                        placeholder="Password"
+                                    />
+                                    <input
+                                        type="password"
+                                        name="confirmPassword"
+                                        value={confirmPassword}
+                                        onChange={handleConfirmPasswordChange}
+                                        className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${passwordError ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
+                                        placeholder="Confirm Password"
+                                    />
+                                    {passwordError && <p className="text-red-500 text-xs italic">{passwordError}</p>}
+                                </div>
+                            </div>
+                            <div className="mt-6">
+                                <button
+                                    type="button"
+                                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    onClick={handleSignup}
+                                >
+                                    {loading ? 'Signing Up...' : 'Sign Up'}
+                                </button>
+                            </div>
+                        </div>
+                        <div className="mt-6">
+                            <div className="rounded-md shadow-sm">
+                                <div>
+                                    <button
+                                        type="button"
+                                        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        onClick={handleSignIn}
+                                    >
+                                        {loading ? 'Signing In...' : 'Sign In'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                )}
 
-			// Perform sign-in logic with MoonSDK
-			console.log('Creating account...');
-			const newAccount = await createAccount();
-			console.log('New Account Data:', newAccount?.data);
-			console.log('Setting expiry and navigating...');
-			moon.MoonAccount.setExpiry(loginResponse.data.expiry);
-			setSignInSuccess(true);
-			setAuthenticatedAddress(newAccount.data.data.address);
-			console.log('Authenticated Address:', newAccount.data.data.address);
-		} catch (error) {
-			console.error('Error during sign-in:', error);
-			setError('Error signing in. Please try again.');
-		} finally {
-			setLoading(false);
-		}
-	};
-
-
-
-	const handleDisconnect = async () => {
-		try {
-			setLoading(true);
-			setError(null);
-
-			// Disconnect from Moon
-			console.log('Disconnecting...');
-			await disconnect();
-			console.log('Disconnected');
-			setIsConnected(false);
-		} catch (error) {
-			console.error('Error during disconnection:', error);
-			setError('Error disconnecting from Moon. Please try again.');
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	return (
-		<div className="flex justify-center items-center h-screen">
-			{!isConnected && (
-				<div>
-					<h2 className="text-2xl font-bold mb-4 text-center">
-						Initialize & Connect to Moon
-					</h2>
-					<button
-						type="button"
-						className="bg-blue-500 text-white p-2 rounded"
-						onClick={handleInitializeAndConnect}
-					>
-						{loading ? 'Connecting...' : 'Initialize & Connect to Moon'}
-					</button>
-					{error && <p className="text-red-500 mt-2">{error}</p>}
-				</div>
-			)}
-
-			{isConnected && !signupSuccess && !signInSuccess && (
-				<form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-96">
-					<div className="mb-4">
-						<h2 className="text-2xl font-bold mb-4 text-center">
-							Sign up for a Moon Account
-						</h2>
-						<input
-							type="email"
-							placeholder="Email"
-							className="w-full border p-2 rounded mb-2"
-							value={email}
-							onChange={handleEmailChange}
-						/>
-					</div>
-					<div className="mb-4">
-						<input
-							type="password"
-							placeholder="Password"
-							className="w-full border p-2 rounded mb-2"
-							value={password}
-							onChange={handlePasswordChange}
-						/>
-					</div>
-					<div className="mb-4">
-						<input
-							type="password"
-							placeholder="Confirm Password"
-							className={`w-full border p-2 rounded mb-2 ${
-								passwordError ? 'border-red-500' : ''
-							}`}
-							value={confirmPassword}
-							onChange={handleConfirmPasswordChange}
-						/>
-						{passwordError && (
-							<p className="text-red-500 text-xs italic">{passwordError}</p>
-						)}
-					</div>
-					<div className="flex justify-center">
-						<button
-							type="button"
-							className="bg-blue-500 text-white p-2 rounded"
-							onClick={handleSignup}
-						>
-							{loading ? 'Signing up...' : 'Sign up for a Moon Account'}
-						</button>
-						{error && <p className="text-red-500 ml-2">{error}</p>}
-					</div>
-				</form>
-			)}
-
-			{signupSuccess && !signInSuccess && isConnected && (
-				<div className="mb-4 text-center">
-					<p>Congratulations! Your Moon account is created.</p>
-					<p>Now that you have created an account, sign in.</p>
-					<form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-96">
-						<div className="mb-4">
-							<h2 className="text-2xl font-bold mb-4 text-center">Sign In</h2>
-							<input
-								type="email"
-								placeholder="Email"
-								className="w-full border p-2 rounded mb-2"
-								value={email}
-								onChange={handleEmailChange}
-							/>
-						</div>
-						<div className="mb-4">
-							<input
-								type="password"
-								placeholder="Password"
-								className="w-full border p-2 rounded mb-2"
-								value={password}
-								onChange={handlePasswordChange}
-							/>
-						</div>
-						<div className="flex justify-center">
-							<button
-								type="button"
-								className="bg-blue-500 text-white p-2 rounded"
-								onClick={handleSignIn}
-							>
-								{loading ? 'Signing in...' : 'Sign In'}
-							</button>
-							{error && <p className="text-red-500 ml-2">{error}</p>}
-						</div>
-					</form>
-				</div>
-			)}
-
-			{signInSuccess && isConnected && (
-				<div className="mt-4 text-center">
-					<p>Authenticated Address: {authenticatedAddress}</p>
-					<button
-						type="button"
-						className="bg-red-500 text-white p-2 rounded mt-2"
-						onClick={handleDisconnect}
-					>
-						{loading ? 'Disconnecting...' : 'Disconnect from Moon'}
-					</button>
-					{error && <p className="text-red-500 mt-2">{error}</p>}
-				</div>
-			)}
-		</div>
-	);
+                {signInSuccess && isConnected && (
+                    <div className="text-center">
+                        <p className="text-lg font-medium text-gray-900">Authenticated Address: {authenticatedAddress}</p>
+                        <button
+                            type="button"
+                            className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                            onClick={handleDisconnect}
+                        >
+                            {loading ? 'Disconnecting...' : 'Disconnect from Moon'}
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 };
 
 export default SignupPage;
