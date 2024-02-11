@@ -6,8 +6,10 @@ const Home: React.FC = () => {
     const router = useRouter();
 
     useEffect(() => {
-        if (router.query.address) {
-            setAddress(router.query.address as string);
+        // Automatically set address from URL query parameters if present
+        const queryAddress = router.query.address as string | undefined;
+        if (queryAddress) {
+            setAddress(queryAddress);
         }
     }, [router.query]);
 
@@ -15,8 +17,8 @@ const Home: React.FC = () => {
         setAddress(event.target.value);
     };
 
-    const fetchTransactions = async (address) => {
-        const apiKey = 'Z6MIAMWBACBYRY95QIWHVJ4WD1NGP557Y8'; 
+    const fetchTransactions = async (address: string) => {
+        const apiKey = 'Z6MIAMWBACBYRY95QIWHVJ4WD1NGP557Y8';
         const url = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`;
 
         const response = await fetch(url);
@@ -29,7 +31,7 @@ const Home: React.FC = () => {
         return data.result;
     };
 
-    const transactionsToCSV = (transactions) => {
+    const transactionsToCSV = (transactions: any[]) => {
         const csvRows = [
             ['Transaction Hash', 'Method ID', 'From', 'To', 'Value (ETH)'],
         ];
@@ -39,7 +41,7 @@ const Home: React.FC = () => {
             const valueInEth = Number(tx.value) / 1e18;
             const csvRow = [
                 tx.hash,
-                methodId, // Extracted Method ID or marked as 'N/A'
+                methodId,
                 tx.from,
                 tx.to,
                 valueInEth.toFixed(18),
@@ -50,7 +52,7 @@ const Home: React.FC = () => {
         return csvRows.map(e => e.join(',')).join('\n');
     };
 
-    const downloadCSV = (csvString, filename) => {
+    const downloadCSV = (csvString: string, filename: string) => {
         const blob = new Blob([csvString], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -79,11 +81,9 @@ const Home: React.FC = () => {
                 <h1 className="text-2xl font-bold">MoonVault</h1>
             </div>
 
-            {address && (
-                <div className="text-center my-4">
-                    <h2 className="text-lg">Your Address: {address}</h2>
-                </div>
-            )}
+            <div className="text-center my-4">
+                <h2 className="text-lg">Your Address: {address || "Not Available"}</h2>
+            </div>
 
             <div className="flex flex-col items-center justify-center flex-grow">
                 <div className="flex items-center justify-center w-full max-w-md mb-4 rounded overflow-hidden shadow-md">

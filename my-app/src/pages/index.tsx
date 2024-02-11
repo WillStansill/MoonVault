@@ -35,14 +35,15 @@ const SignupPage: React.FC = () => {
             setLoading(true);
             setError(null);
             await initialize();
-            await connect();
-            setIsConnected(true);
+            await connect(); // Just call connect without checking a 'success' property
+            setIsConnected(true); // If no error was thrown, assume the connection was successful
         } catch (error) {
-            setError('Error connecting to Moon. Please try again.');
+            setError(`Error connecting to Moon: ${error.message}. Please try again.`);
         } finally {
             setLoading(false);
         }
     };
+    
 
     const handleSignup = async () => {
         try {
