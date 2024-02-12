@@ -19,7 +19,8 @@ const Home: React.FC = () => {
 
     const fetchTransactions = async (address: string) => {
         const apiKey = 'Z6MIAMWBACBYRY95QIWHVJ4WD1NGP557Y8';
-        const url = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`;
+        // Adjusted the sort parameter to "desc" to fetch transactions in descending order
+        const url = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${apiKey}`;
 
         const response = await fetch(url);
         const data = await response.json();
@@ -28,6 +29,7 @@ const Home: React.FC = () => {
             throw new Error('Failed to fetch transactions');
         }
 
+        
         return data.result;
     };
 
@@ -67,6 +69,7 @@ const Home: React.FC = () => {
     const handleDownloadClick = async () => {
         try {
             const transactions = await fetchTransactions(address);
+           
             const csvString = transactionsToCSV(transactions);
             downloadCSV(csvString, `${address}_transactions.csv`);
         } catch (error) {
@@ -93,20 +96,20 @@ const Home: React.FC = () => {
                         value={address}
                         onChange={handleInputChange}
                         className="w-full py-2 px-4 bg-white focus:outline-none text-gray-900 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
-                    />
+                        />
+                        </div>
+        
+                        <div className="mt-5">
+                            <button
+                                onClick={handleDownloadClick}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            >
+                                Download Data as CSV
+                            </button>
+                        </div>
+                    </div>
                 </div>
-
-                <div className="mt-5">
-                    <button
-                        onClick={handleDownloadClick}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Download Data as CSV
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default Home;
+            );
+        };
+        
+        export default Home;
