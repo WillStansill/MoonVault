@@ -9,14 +9,12 @@ const SignupPage: React.FC = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
-    const [signupSuccess, setSignupSuccess] = useState(false);
-    const [signInSuccess, setSignInSuccess] = useState(false);
-    const [authenticatedAddress, setAuthenticatedAddress] = useState('');
     const [isConnected, setIsConnected] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showSignUp, setShowSignUp] = useState(false);
 
-    const { moon, connect, createAccount, disconnect, updateToken, initialize } = useMoonSDK();
+    const { moon, connect, createAccount, updateToken, initialize } = useMoonSDK();
 
     const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value);
@@ -35,32 +33,10 @@ const SignupPage: React.FC = () => {
             setLoading(true);
             setError(null);
             await initialize();
-            await connect(); // Just call connect without checking a 'success' property
-            setIsConnected(true); // If no error was thrown, assume the connection was successful
+            await connect();
+            setIsConnected(true);
         } catch (error) {
             setError(`Error connecting to Moon: ${error.message}. Please try again.`);
-        } finally {
-            setLoading(false);
-        }
-    };
-    
-
-    const handleSignup = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            if (password !== confirmPassword) {
-                setPasswordError('Passwords do not match');
-                return;
-            }
-
-            const signupRequest: EmailSignupInput = { email, password };
-            const signupResponse = await moon?.getAuthSDK().emailSignup(signupRequest);
-            setSignupSuccess(true);
-			router.push(`/home?address=${encodeURIComponent(authenticatedAddress)}`);
-		} catch (error) {
-            setError('Error signing up. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -79,23 +55,32 @@ const SignupPage: React.FC = () => {
             moon?.MoonAccount.setExpiry(loginResponse.data.expiry);
 
             const newAccount = await createAccount();
-            setSignInSuccess(true);
-            setAuthenticatedAddress(newAccount.data.data.address);
-			router.push(`/home?address=${encodeURIComponent(newAccount.data.data.address)}`);
-		} catch (error) {
+            router.push(`/home?address=${encodeURIComponent(newAccount.data.data.address)}`);
+        } catch (error) {
             setError('Error signing in. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleDisconnect = async () => {
+    const handleSignUp = async () => {
+        if (password !== confirmPassword) {
+            setPasswordError('Passwords do not match');
+            return;
+        }
+
         try {
             setLoading(true);
-            await disconnect();
-            setIsConnected(false);
+            setError(null);
+            setPasswordError('');
+
+            const signupRequest: EmailSignupInput = { email, password };
+            await moon?.getAuthSDK().emailSignup(signupRequest);
+
+            const newAccount = await createAccount();
+            router.push(`/home?address=${encodeURIComponent(newAccount.data.data.address)}`);
         } catch (error) {
-            setError('Error disconnecting from Moon. Please try again.');
+            setError('Error signing up. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -106,7 +91,7 @@ const SignupPage: React.FC = () => {
             <div className="max-w-md w-full space-y-8">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        {isConnected ? (signupSuccess || signInSuccess) ? 'Welcome to Your Moon Account' : 'Create Your Moon Account' : 'Connect to Moon'}
+                        Connect to Moon
                     </h2>
                     <p className="mt-2 text-center text-sm text-gray-600">
                         {error && <span className="font-medium text-red-500">{error}</span>}
@@ -121,78 +106,71 @@ const SignupPage: React.FC = () => {
                         {loading ? 'Connecting...' : 'Initialize & Connect to Moon'}
                     </button>
                 )}
-
-                {isConnected && !signupSuccess && !signInSuccess && (
+                {isConnected && !showSignUp && (
                     <>
-                        <div className="mt-8">
-                            <div className="rounded-md shadow-sm">
-                                <div>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={email}
-                                        onChange={handleEmailChange}
-                                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                        placeholder="Email"
-                                    />
-                                </div>
-                                <div className="-space-y-px">
-                                    <input
-                                        type="password"
-                                        name="password"
-                                        value={password}
-                                        onChange={handlePasswordChange}
-                                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                        placeholder="Password"
-                                    />
-                                    <input
-                                        type="password"
-                                        name="confirmPassword"
-                                        value={confirmPassword}
-                                        onChange={handleConfirmPasswordChange}
-                                        className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${passwordError ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
-                                        placeholder="Confirm Password"
-                                    />
-                                    {passwordError && <p className="text-red-500 text-xs italic">{passwordError}</p>}
-                                </div>
-                            </div>
-                            <div className="mt-6">
-                                <button
-                                    type="button"
-                                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    onClick={handleSignup}
-                                >
-                                    {loading ? 'Signing Up...' : 'Sign Up'}
-                                </button>
-                            </div>
-                        </div>
-                        <div className="mt-6">
-                            <div className="rounded-md shadow-sm">
-                                <div>
-                                    <button
-                                        type="button"
-                                        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        onClick={handleSignIn}
-                                    >
-                                        {loading ? 'Signing In...' : 'Sign In'}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </>
-                )}
-
-                {signInSuccess && isConnected && (
-                    <div className="text-center">
-                        <p className="text-lg font-medium text-gray-900">Authenticated Address: {authenticatedAddress}</p>
+                        <input
+                            type="email"
+                            name="email"
+                            value={email}
+                            onChange={handleEmailChange}
+                            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                            placeholder="Email"
+                        />
+                        <input
+                            type="password"
+                            name="password"
+                            value={password}
+                            onChange={handlePasswordChange}
+                            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                            placeholder="Password"
+                        />
                         <button
                             type="button"
-                            className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                            onClick={handleDisconnect}
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
+                            onClick={handleSignIn}
                         >
-                            {loading ? 'Disconnecting...' : 'Disconnect from Moon'}
+                            {loading ? 'Signing In...' : 'Sign In'}
                         </button>
-                    </div>
+                        <p className="text-center mt-4 cursor-pointer text-indigo-600 hover:text-indigo-800" onClick={() => setShowSignUp(true)}>
+                            Don't have a Moon account? Sign Up Here
+                        </p>
+                    </>
+                )}
+                {showSignUp && (
+                    <>
+                        <input
+                            type="email"
+                            name="email"
+                            value={email}
+                            onChange={handleEmailChange}
+                            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                            placeholder="Email"
+                        />
+                        <input
+                            type="password"
+                            name="password"
+                            value={password}
+                            onChange={handlePasswordChange}
+                            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            placeholder="Password"
+                        />
+                        <input
+                            type="password"
+                            name="confirmPassword"
+                            value={confirmPassword}
+                            onChange={handleConfirmPasswordChange}
+                            className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${passwordError ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
+                            placeholder="Confirm Password"
+                        />
+                        {passwordError && <p className="text-red-500 text-xs italic">{passwordError}</p>}
+                        <button
+                            type="button"
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
+                            onClick={handleSignUp}
+                        >
+                            {loading ? 'Signing Up...' : 'Sign Up'}
+                        </button>
+                    </>
                 )}
             </div>
         </div>
