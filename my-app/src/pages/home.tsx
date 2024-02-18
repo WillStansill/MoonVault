@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { ApolloSandbox } from '@apollo/sandbox';
+import { EmbeddedSandbox } from './EmbeddedSandbox';
+
+
 
 const Home: React.FC = () => {
+
+    const [showEmbeddedSandbox, setShowEmbeddedSandbox] = useState(false);
     const [address, setAddress] = useState('');
     const router = useRouter();
 
@@ -12,6 +18,11 @@ const Home: React.FC = () => {
             setAddress(queryAddress);
         }
     }, [router.query]);
+
+    const toggleEmbeddedSandbox = () => {
+        setShowEmbeddedSandbox(!showEmbeddedSandbox);
+        console.log(showEmbeddedSandbox)
+      };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setAddress(event.target.value);
@@ -106,6 +117,12 @@ const Home: React.FC = () => {
                             >
                                 Download Data as CSV
                             </button>
+                            <button
+                                onClick={toggleEmbeddedSandbox}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                >
+                                    Attestations
+                                </button>
                         </div>
                     </div>
                 </div>
