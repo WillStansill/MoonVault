@@ -73,7 +73,10 @@ EtherScan API Key: Z6MIAMWBACBYRY95QIWHVJ4WD1NGP557Y8
 
 Apollographql: https://sepolia.easscan.org/graphql
 
-Address with attestation on Sepolia Testnet: 0xB0739AaF97B5F12D3529ec6C109fbE1A9c9F6bAe
-
 Email to sign in (password is test)
 yolal30007@fkcod.com
+
+Address with attestation on Sepolia Testnet: 0xB0739AaF97B5F12D3529ec6C109fbE1A9c9F6bAe
+
+Vitalik Address:
+0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045

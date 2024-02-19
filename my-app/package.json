@@ -12,6 +12,7 @@
     "@apollo/client": "^3.9.5",
     "@apollo/sandbox": "^2.5.1",
     "@apollo/server": "^4.10.0",
+    "@moonup/moon-sdk": "^1.0.0",
     "graphql": "^16.8.1",
     "next": "latest",
     "next-pwa": "^5.6.0",
