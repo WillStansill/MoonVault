@@ -142,7 +142,13 @@ const Home: React.FC = () => {
     };
 
     return (
-        <div className="h-screen flex flex-col bg-gray-50 text-gray-900">
+        <div className="h-screen flex flex-col bg-gray-50 text-gray-900"
+       style={{
+           backgroundImage: "url('https://i.imgur.com/HbqRpmO.png')",
+           backgroundSize: '30%', // Make the background image 80% of its original size
+           backgroundPosition: 'right', // Align the background image to the right side
+           backgroundRepeat: 'no-repeat', // Ensure the background image doesn't repeat
+       }}>
             <div className="text-white text-center py-4 shadow-md" style={{ background: 'linear-gradient(90deg, #0d4770, #12dcdc)' }}>
                 <h1 className="text-2xl font-bold">MoonVault</h1>
             </div>
