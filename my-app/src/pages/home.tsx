@@ -143,7 +143,7 @@ const Home: React.FC = () => {
 
     return (
         <div className="h-screen flex flex-col bg-gray-50 text-gray-900">
-            <div className="bg-indigo-600 text-white text-center py-4 shadow-md">
+            <div className="text-white text-center py-4 shadow-md" style={{ background: 'linear-gradient(90deg, #0d4770, #12dcdc)' }}>
                 <h1 className="text-2xl font-bold">MoonVault</h1>
             </div>
 
@@ -167,7 +167,7 @@ const Home: React.FC = () => {
                 <div className="mt-5">
                     <button
                         onClick={handleDisplayRecentTransactions}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
                         Display Recent Transactions
                     </button>
@@ -176,7 +176,7 @@ const Home: React.FC = () => {
                 <div className="mt-5">
                     <button
                         onClick={handleDownloadClick}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
                         Download Transactions as CSV
                     </button>
@@ -185,7 +185,7 @@ const Home: React.FC = () => {
                 <div className="mt-5">
                     <button
                         onClick={handleAttestationDownload}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
                         Download Attestations as CSV
                     </button>

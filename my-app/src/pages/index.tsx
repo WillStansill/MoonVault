@@ -100,7 +100,8 @@ const SignupPage: React.FC = () => {
                 {!isConnected && (
                     <button
                         type="button"
-                        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0d577c] hover:bg-[#10a8b6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        // className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         onClick={handleInitializeAndConnect}
                     >
                         {loading ? 'Connecting...' : 'Initialize & Connect to Moon'}
@@ -126,12 +127,13 @@ const SignupPage: React.FC = () => {
                         />
                         <button
                             type="button"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0d577c] hover:bg-[#10a8b6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
                             onClick={handleSignIn}
                         >
                             {loading ? 'Signing In...' : 'Sign In'}
                         </button>
-                        <p className="text-center mt-4 cursor-pointer text-indigo-600 hover:text-indigo-800" onClick={() => setShowSignUp(true)}>
+                        <p className="text-center mt-4 cursor-pointer text-[#0d577c] hover:text-[#10a8b6]" onClick={() => setShowSignUp(true)}>
+
                             Don't have a Moon account? Sign Up Here
                         </p>
                     </>
@@ -165,7 +167,7 @@ const SignupPage: React.FC = () => {
                         {passwordError && <p className="text-red-500 text-xs italic">{passwordError}</p>}
                         <button
                             type="button"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0d577c] hover:bg-[#10a8b6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
                             onClick={handleSignUp}
                         >
                             {loading ? 'Signing Up...' : 'Sign Up'}
