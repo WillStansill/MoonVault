@@ -142,81 +142,84 @@ const Home: React.FC = () => {
     };
 
     return (
-        <div className="h-screen flex flex-col bg-gray-50 text-gray-900"
-       style={{
-           backgroundImage: "url('https://i.imgur.com/HbqRpmO.png')",
-           backgroundSize: '30%', // Make the background image 80% of its original size
-           backgroundPosition: 'right', // Align the background image to the right side
-           backgroundRepeat: 'no-repeat', // Ensure the background image doesn't repeat
-       }}>
-            <div className="text-white text-center py-4 shadow-md" style={{ background: 'linear-gradient(90deg, #0d4770, #12dcdc)' }}>
-                <h1 className="text-2xl font-bold">MoonVault</h1>
-            </div>
-
+        <div className="h-screen flex flex-col bg-white text-black" style={{
+          // Your existing background image styles
+          backgroundImage: "url('https://imgur.com/HbqRpmO.png')",
+          backgroundSize: '50%',
+          backgroundPosition: 'left top',
+          backgroundRepeat: 'no-repeat',
+          
+        }}>
+          {/* MoonVault header */}
+          <div className="text-white text-center py-4 shadow-md" style={{ background: 'linear-gradient(90deg, #0d4770, #12dcdc)' }}>
+            <h1 className="text-2xl font-bold">MoonVault</h1>
+          </div>
+      
+          {/* Content */}
+          <div className="flex flex-col items-center justify-center flex-grow" style={{ paddingLeft: '500px' }}>
             <div className="text-center my-4">
-                <h2 className="text-lg">My Account Address: {initialAddress || "Not Available"}</h2> {/* Modified to display initialAddress */}
+              <h2 className="text-lg">My Account Address: {initialAddress || "Not Available"}</h2>
             </div>
-
-            <div className="flex flex-col items-center justify-center flex-grow">
-                <p className="text-lg mb-4">What address do you want the data from?</p> {/* Added line above search bar */}
-
-                <div className="flex items-center justify-center w-full max-w-md mb-4 rounded overflow-hidden shadow-md">
-                    <input
-                        type="text"
-                        placeholder="Enter a Wallet Address"
-                        value={address}
-                        onChange={handleInputChange}
-                        className="w-full py-2 px-4 bg-white focus:outline-none text-gray-900 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
-                    />
-                </div>
-
-                <div className="mt-5">
-                    <button
-                        onClick={handleDisplayRecentTransactions}
-                        className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Display Recent Transactions
-                    </button>
-                </div>
-
-                <div className="mt-5">
-                    <button
-                        onClick={handleDownloadClick}
-                        className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Download Transactions as CSV
-                    </button>
-                </div>
-
-                <div className="mt-5">
-                    <button
-                        onClick={handleAttestationDownload}
-                        className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Download Attestations as CSV
-                    </button>
-                </div>
-
-                {/* Modified section for displaying recent transactions in a scrollable box */}
-                {recentTransactions.length > 0 && (
-                    <div className="mt-5 w-full max-w-xl overflow-auto" style={{ maxHeight: '300px' }}>
-                        <h3 className="text-lg font-semibold">Recent Transactions</h3>
-                        <div className="mt-2 p-2 bg-white overflow-y-auto" style={{ border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                            {recentTransactions.map((transaction, index) => (
-                                <div key={index} className="mt-2 border-b border-gray-200 pb-2">
-                                    <p><strong>Hash:</strong> {transaction.hash}</p>
-                                    <p><strong>Method ID:</strong> {transaction.input.startsWith('0x') && transaction.input.length >= 10 ? transaction.input.substring(0, 10) : 'N/A'}</p>
-                                    <p><strong>From:</strong> {transaction.from}</p>
-                                    <p><strong>To:</strong> {transaction.to}</p>
-                                    <p><strong>Value:</strong> {Number(transaction.value) / 1e18} ETH</p>
-                                </div>
-                            ))}
-                        </div>
+      
+            <p className="text-lg mb-4">What address do you want the data from?</p>
+      
+            <div className="flex items-center justify-center w-full max-w-md mb-4 rounded overflow-hidden shadow-md">
+              <input
+                type="text"
+                placeholder="Enter a Wallet Address"
+                value={address}
+                onChange={handleInputChange}
+                className="w-full py-2 px-4 bg-white focus:outline-none text-gray-900 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+      
+            <div className="mt-5">
+              <button
+                onClick={handleDisplayRecentTransactions}
+                className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                Display Recent Transactions
+              </button>
+            </div>
+      
+            <div className="mt-5">
+              <button
+                onClick={handleDownloadClick}
+                className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                Download Transactions as CSV
+              </button>
+            </div>
+      
+            <div className="mt-5">
+              <button
+                onClick={handleAttestationDownload}
+                className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                Download Attestations as CSV
+              </button>
+            </div>
+      
+            {recentTransactions.length > 0 && (
+              <div className="mt-5 w-full max-w-xl overflow-auto" style={{ maxHeight: '300px' }}>
+                <h3 className="text-lg font-semibold">Recent Transactions</h3>
+                <div className="mt-2 p-2 bg-white overflow-y-auto" style={{ border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                  {recentTransactions.map((transaction, index) => (
+                    <div key={index} className="mt-2 border-b border-gray-200 pb-2">
+                      <p><strong>Hash:</strong> {transaction.hash}</p>
+                      <p><strong>Method ID:</strong> {transaction.input.startsWith('0x') && transaction.input.length >= 10 ? transaction.input.substring(0, 10) : 'N/A'}</p>
+                      <p><strong>From:</strong> {transaction.from}</p>
+                      <p><strong>To:</strong> {transaction.to}</p>
+                      <p><strong>Value:</strong> {Number(transaction.value) / 1e18} ETH</p>
                     </div>
-                )}
-            </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-    );
-};
+      );
+      
+                            }
 
 export default Home;
