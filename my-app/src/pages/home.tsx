@@ -2,26 +2,66 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useApolloClient, gql } from '@apollo/client';
 
+// Component to fetch and display crypto prices in a scrolling ticker
+const CryptoPricesTicker = () => {
+    // State to hold prices of various cryptocurrencies
+    const [prices, setPrices] = useState({ BTC: '', ETH: '', BNB: '', OP: '', ARB: 'N/A' });
+
+    useEffect(() => {
+        // Fetches crypto prices from CoinGecko API on component mount
+        const fetchPrices = async () => {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin,optimism&vs_currencies=usd');
+                const data = await response.json();
+                setPrices({
+                    BTC: data.bitcoin.usd,
+                    ETH: data.ethereum.usd,
+                    BNB: data.binancecoin.usd,
+                    OP: data.optimism.usd,
+                });
+            } catch (error) {
+                console.error('Failed to fetch crypto prices:', error);
+            }
+        };
+
+        fetchPrices();
+    }, []);
+
+    // Render the ticker with fetched prices
+    return (
+        <div className="crypto-ticker bg-gray-800 text-white py-2 text-center">
+            <marquee>
+                BTC: ${prices.BTC} | ETH: ${prices.ETH} | BNB: ${prices.BNB} | OP: ${prices.OP}
+            </marquee>
+        </div>
+    );
+};
+
+// Main Home component
 const Home: React.FC = () => {
+    // State for storing user input and fetched transactions
     const [address, setAddress] = useState('');
-    const [initialAddress, setInitialAddress] = useState(''); // Added to store the initial address
+    const [initialAddress, setInitialAddress] = useState('');
     const router = useRouter();
     const apolloClient = useApolloClient();
     const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
     const [showEmbeddedSandbox, setShowEmbeddedSandbox] = useState(false);
 
+    // Effect to read address from URL query and set it to state
     useEffect(() => {
         const queryAddress = router.query.address as string | undefined;
         if (queryAddress) {
             setAddress(queryAddress);
-            setInitialAddress(queryAddress); // Set the initial address
+            setInitialAddress(queryAddress);
         }
     }, [router.query]);
 
+    // Toggle visibility of an embedded sandbox (not used in provided code)
     const toggleEmbeddedSandbox = () => {
         setShowEmbeddedSandbox(!showEmbeddedSandbox);
     };
 
+    // Fetches transactions for a given address using Etherscan API
     const fetchTransactions = async (address: string) => {
         const apiKey = 'Z6MIAMWBACBYRY95QIWHVJ4WD1NGP557Y8';
         const url = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${apiKey}`;
@@ -36,6 +76,7 @@ const Home: React.FC = () => {
         return data.result;
     };
 
+    // Displays recent transactions for the address
     const handleDisplayRecentTransactions = async () => {
         try {
             const transactions = await fetchTransactions(address);
@@ -50,6 +91,7 @@ const Home: React.FC = () => {
         }
     };
 
+    // Converts transactions to CSV format
     const transactionsToCSV = (transactions: any[]) => {
         const csvRows = [
             ['Transaction Hash', 'Method ID', 'From', 'To', 'Value (ETH)'],
@@ -70,10 +112,12 @@ const Home: React.FC = () => {
         return csvRows.map(e => e.join(',')).join('\n');
     };
 
+    // Handles input change to update the address state
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setAddress(event.target.value);
     };
 
+    // Downloads transactions or attestations as a CSV file
     const downloadCSV = (csvString: string, filename: string) => {
         const blob = new Blob([csvString], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
@@ -86,6 +130,7 @@ const Home: React.FC = () => {
         a.remove();
     };
 
+    // Initiates download of transactions CSV
     const handleDownloadClick = async () => {
         try {
             const transactions = await fetchTransactions(address);
@@ -101,6 +146,7 @@ const Home: React.FC = () => {
         }
     };
 
+    // Similar to transactions CSV, for attestations (not used in provided code)
     const attestationsToCSV = (attestations: any[]) => {
         const csvRows = [['Recipient', 'Transaction ID']];
         attestations.forEach(attestation => {
@@ -109,6 +155,7 @@ const Home: React.FC = () => {
         return csvRows.map(e => e.join(',')).join('\n');
     };
 
+    // Initiates download of attestations CSV
     const handleAttestationDownload = async () => {
         try {
             const { data } = await apolloClient.query({
@@ -141,28 +188,28 @@ const Home: React.FC = () => {
         }
     };
 
+    // Render the main component
     return (
         <div className="h-screen flex flex-col bg-white text-black" style={{
-          // Your existing background image styles
           backgroundImage: "url('https://imgur.com/HbqRpmO.png')",
-          backgroundSize: '50%',
-          backgroundPosition: 'left top',
+          backgroundSize: '22%',
+          backgroundPosition: '20% center',
           backgroundRepeat: 'no-repeat',
-          
         }}>
-          {/* MoonVault header */}
+          {/* Header section with MoonVault title */}
           <div className="text-white text-center py-4 shadow-md" style={{ background: 'linear-gradient(90deg, #0d4770, #12dcdc)' }}>
             <h1 className="text-2xl font-bold">MoonVault</h1>
           </div>
-      
-          {/* Content */}
+          {/* Crypto prices ticker displayed below the title */}
+          <CryptoPricesTicker />
+          {/* Main content area */}
           <div className="flex flex-col items-center justify-center flex-grow" style={{ paddingLeft: '500px' }}>
+            {/* Display of the queried or entered account address */}
             <div className="text-center my-4">
               <h2 className="text-lg">My Account Address: {initialAddress || "Not Available"}</h2>
             </div>
-      
+            {/* Input for entering a new address */}
             <p className="text-lg mb-4">What address do you want the data from?</p>
-      
             <div className="flex items-center justify-center w-full max-w-md mb-4 rounded overflow-hidden shadow-md">
               <input
                 type="text"
@@ -172,7 +219,7 @@ const Home: React.FC = () => {
                 className="w-full py-2 px-4 bg-white focus:outline-none text-gray-900 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
               />
             </div>
-      
+            {/* Buttons to trigger various actions */}
             <div className="mt-5">
               <button
                 onClick={handleDisplayRecentTransactions}
@@ -181,7 +228,6 @@ const Home: React.FC = () => {
                 Display Recent Transactions
               </button>
             </div>
-      
             <div className="mt-5">
               <button
                 onClick={handleDownloadClick}
@@ -190,7 +236,6 @@ const Home: React.FC = () => {
                 Download Transactions as CSV
               </button>
             </div>
-      
             <div className="mt-5">
               <button
                 onClick={handleAttestationDownload}
@@ -199,7 +244,7 @@ const Home: React.FC = () => {
                 Download Attestations as CSV
               </button>
             </div>
-      
+            {/* Section to display fetched transactions */}
             {recentTransactions.length > 0 && (
               <div className="mt-5 w-full max-w-xl overflow-auto" style={{ maxHeight: '300px' }}>
                 <h3 className="text-lg font-semibold">Recent Transactions</h3>
@@ -218,8 +263,7 @@ const Home: React.FC = () => {
             )}
           </div>
         </div>
-      );
-      
-                            }
+    );
+};
 
 export default Home;

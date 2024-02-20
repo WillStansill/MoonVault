@@ -3,8 +3,12 @@ import { useRouter } from 'next/router';
 import { useMoonSDK } from './usemoonsdk'; // Adjust the path as necessary
 import { EmailLoginInput, EmailSignupInput } from '@moonup/moon-api';
 
+// The main component for handling user sign-up and sign-in
 const SignupPage: React.FC = () => {
+    // Hook to manipulate the URL and navigate programmatically
     const router = useRouter();
+
+    // State hooks to manage form inputs and application state
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -14,8 +18,10 @@ const SignupPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [showSignUp, setShowSignUp] = useState(false);
 
+    // Custom hook to interact with the Moon SDK
     const { moon, connect, createAccount, updateToken, initialize } = useMoonSDK();
 
+    // Event handlers for form inputs
     const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value);
     };
@@ -28,6 +34,7 @@ const SignupPage: React.FC = () => {
         setConfirmPassword(event.target.value);
     };
 
+    // Initialize and connect to Moon's service
     const handleInitializeAndConnect = async () => {
         try {
             setLoading(true);
@@ -42,6 +49,7 @@ const SignupPage: React.FC = () => {
         }
     };
 
+    // Handle the sign-in process
     const handleSignIn = async () => {
         try {
             setLoading(true);
@@ -63,6 +71,7 @@ const SignupPage: React.FC = () => {
         }
     };
 
+    // Handle the sign-up process
     const handleSignUp = async () => {
         if (password !== confirmPassword) {
             setPasswordError('Passwords do not match');
@@ -86,9 +95,11 @@ const SignupPage: React.FC = () => {
         }
     };
 
+    // The component's render method
     return (
         <div className="flex flex-col justify-center items-center h-screen bg-gray-50 px-4">
             <div className="max-w-md w-full space-y-8">
+                {/* Display connection status or error messages */}
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
                         Connect to Moon
@@ -97,16 +108,16 @@ const SignupPage: React.FC = () => {
                         {error && <span className="font-medium text-red-500">{error}</span>}
                     </p>
                 </div>
+                {/* Conditionally render the connect button if not connected */}
                 {!isConnected && (
                     <button
-                        type="button"
-                        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0d577c] hover:bg-[#10a8b6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        // className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         onClick={handleInitializeAndConnect}
+                        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0d577c] hover:bg-[#10a8b6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
                         {loading ? 'Connecting...' : 'Initialize & Connect to Moon'}
                     </button>
                 )}
+                {/* Render sign-in form if connected but not in sign-up mode */}
                 {isConnected && !showSignUp && (
                     <>
                         <input
@@ -114,30 +125,32 @@ const SignupPage: React.FC = () => {
                             name="email"
                             value={email}
                             onChange={handleEmailChange}
-                            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                             placeholder="Email"
+                            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                         />
                         <input
                             type="password"
                             name="password"
                             value={password}
                             onChange={handlePasswordChange}
-                            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                             placeholder="Password"
+                            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                         />
                         <button
-                            type="button"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0d577c] hover:bg-[#10a8b6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
                             onClick={handleSignIn}
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0d577c] hover:bg-[#10a8b6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
                         >
                             {loading ? 'Signing In...' : 'Sign In'}
                         </button>
-                        <p className="text-center mt-4 cursor-pointer text-[#0d577c] hover:text-[#10a8b6]" onClick={() => setShowSignUp(true)}>
-
+                        <p
+                            onClick={() => setShowSignUp(true)}
+                            className="text-center mt-4 cursor-pointer text-[#0d577c] hover:text-[#10a8b6]"
+                        >
                             Don't have a Moon account? Sign Up Here
                         </p>
                     </>
                 )}
+                {/* Render sign-up form if in sign-up mode */}
                 {showSignUp && (
                     <>
                         <input
@@ -145,30 +158,29 @@ const SignupPage: React.FC = () => {
                             name="email"
                             value={email}
                             onChange={handleEmailChange}
-                            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                             placeholder="Email"
+                            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                         />
                         <input
                             type="password"
                             name="password"
                             value={password}
                             onChange={handlePasswordChange}
-                            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             placeholder="Password"
+                            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         />
                         <input
                             type="password"
                             name="confirmPassword"
                             value={confirmPassword}
                             onChange={handleConfirmPasswordChange}
-                            className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${passwordError ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
                             placeholder="Confirm Password"
+                            className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${passwordError ? 'border-red-500' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm`}
                         />
                         {passwordError && <p className="text-red-500 text-xs italic">{passwordError}</p>}
                         <button
-                            type="button"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0d577c] hover:bg-[#10a8b6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
                             onClick={handleSignUp}
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#0d577c] hover:bg-[#10a8b6] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
                         >
                             {loading ? 'Signing Up...' : 'Sign Up'}
                         </button>
