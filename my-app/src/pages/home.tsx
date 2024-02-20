@@ -46,6 +46,8 @@ const Home: React.FC = () => {
     const apolloClient = useApolloClient();
     const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
     const [showEmbeddedSandbox, setShowEmbeddedSandbox] = useState(false);
+    const [showTransactions, setShowTransactions] = useState(false);
+    const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
 
     // Effect to read address from URL query and set it to state
     useEffect(() => {
@@ -63,21 +65,33 @@ const Home: React.FC = () => {
 
     // Fetches transactions for a given address using Etherscan API
     const fetchTransactions = async (address: string) => {
-        const apiKey = 'Z6MIAMWBACBYRY95QIWHVJ4WD1NGP557Y8';
-        const url = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${apiKey}`;
+      setIsLoadingTransactions(true);
+      try {
+          const apiKey = 'Z6MIAMWBACBYRY95QIWHVJ4WD1NGP557Y8';
+          const url = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${apiKey}`;
 
-        const response = await fetch(url);
-        const data = await response.json();
+          const response = await fetch(url);
+          const data = await response.json();
 
-        if (data.status !== '1') {
-            throw new Error('Failed to fetch transactions');
-        }
+          if (data.status !== '1') {
+              throw new Error('Failed to fetch transactions');
+          }
 
-        return data.result;
-    };
+          return data.result;
+      } finally {
+          setIsLoadingTransactions(false);
+      }
+  };
+
+  // Handles input change to update the address state
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAddress(event.target.value);
+    setShowTransactions(false); // Resetting to hide transactions
+};
 
     // Displays recent transactions for the address
     const handleDisplayRecentTransactions = async () => {
+      setShowTransactions(false); 
         try {
             const transactions = await fetchTransactions(address);
             if (transactions.length === 0) {
@@ -85,11 +99,16 @@ const Home: React.FC = () => {
                 return;
             }
             setRecentTransactions(transactions.slice(0, 100));
+            setShowTransactions(true);
         } catch (error) {
             console.error('Failed to fetch recent transactions:', error);
             alert('Failed to fetch recent transactions. Check console for details.');
         }
     };
+    const handleHideTransactions = () => {
+      setShowTransactions(false);
+      setRecentTransactions([]);
+  };
 
     // Converts transactions to CSV format
     const transactionsToCSV = (transactions: any[]) => {
@@ -113,10 +132,7 @@ const Home: React.FC = () => {
     };
 
     // Handles input change to update the address state
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAddress(event.target.value);
-    };
-
+    
     // Downloads transactions or attestations as a CSV file
     const downloadCSV = (csvString: string, filename: string) => {
         const blob = new Blob([csvString], { type: 'text/csv' });
@@ -190,80 +206,91 @@ const Home: React.FC = () => {
 
     // Render the main component
     return (
-        <div className="h-screen flex flex-col bg-white text-black" style={{
-          backgroundImage: "url('https://imgur.com/HbqRpmO.png')",
-          backgroundSize: '22%',
-          backgroundPosition: '20% center',
-          backgroundRepeat: 'no-repeat',
-        }}>
-          {/* Header section with MoonVault title */}
-          <div className="text-white text-center py-4 shadow-md" style={{ background: 'linear-gradient(90deg, #0d4770, #12dcdc)' }}>
-            <h1 className="text-2xl font-bold">MoonVault</h1>
-          </div>
-          {/* Crypto prices ticker displayed below the title */}
-          <CryptoPricesTicker />
-          {/* Main content area */}
-          <div className="flex flex-col items-center justify-center flex-grow" style={{ paddingLeft: '500px' }}>
-            {/* Display of the queried or entered account address */}
-            <div className="text-center my-4">
-              <h2 className="text-lg">My Account Address: {initialAddress || "Not Available"}</h2>
-            </div>
-            {/* Input for entering a new address */}
-            <p className="text-lg mb-4">What address do you want the data from?</p>
-            <div className="flex items-center justify-center w-full max-w-md mb-4 rounded overflow-hidden shadow-md">
-              <input
-                type="text"
-                placeholder="Enter a Wallet Address"
-                value={address}
-                onChange={handleInputChange}
-                className="w-full py-2 px-4 bg-white focus:outline-none text-gray-900 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-            {/* Buttons to trigger various actions */}
-            <div className="mt-5">
-              <button
-                onClick={handleDisplayRecentTransactions}
-                className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              >
-                Display Recent Transactions
-              </button>
-            </div>
-            <div className="mt-5">
-              <button
-                onClick={handleDownloadClick}
-                className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              >
-                Download Transactions as CSV
-              </button>
-            </div>
-            <div className="mt-5">
-              <button
-                onClick={handleAttestationDownload}
-                className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              >
-                Download Attestations as CSV
-              </button>
-            </div>
-            {/* Section to display fetched transactions */}
-            {recentTransactions.length > 0 && (
-              <div className="mt-5 w-full max-w-xl overflow-auto" style={{ maxHeight: '300px' }}>
-                <h3 className="text-lg font-semibold">Recent Transactions</h3>
-                <div className="mt-2 p-2 bg-white overflow-y-auto" style={{ border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                  {recentTransactions.map((transaction, index) => (
-                    <div key={index} className="mt-2 border-b border-gray-200 pb-2">
-                      <p><strong>Hash:</strong> {transaction.hash}</p>
-                      <p><strong>Method ID:</strong> {transaction.input.startsWith('0x') && transaction.input.length >= 10 ? transaction.input.substring(0, 10) : 'N/A'}</p>
-                      <p><strong>From:</strong> {transaction.from}</p>
-                      <p><strong>To:</strong> {transaction.to}</p>
-                      <p><strong>Value:</strong> {Number(transaction.value) / 1e18} ETH</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+      <div className="h-screen flex flex-col bg-white text-black" style={{
+        backgroundImage: "url('https://imgur.com/HbqRpmO.png')",
+        backgroundSize: '44%',
+        backgroundPosition: 'left bottom',
+        backgroundRepeat: 'no-repeat',
+      }}>
+        {/* Header section with MoonVault title */}
+        <div className="text-white text-center py-4 shadow-md" style={{ background: 'linear-gradient(90deg, #0d4770, #12dcdc)' }}>
+          <h1 className="text-2xl font-bold">MoonVault</h1>
         </div>
-    );
+        {/* Crypto prices ticker displayed below the title */}
+        <CryptoPricesTicker />
+        {/* Main content area */}
+        <div className="flex flex-col items-center justify-center flex-grow" style={{ paddingLeft: '500px' }}>
+          {/* Display of the queried or entered account address */}
+          <div className="text-center my-4">
+            <h2 className="text-lg">My Account Address: {initialAddress || "Not Available"}</h2>
+          </div>
+          {/* Input for entering a new address */}
+          <p className="text-lg mb-4">What address do you want the data from?</p>
+          <div className="flex items-center justify-center w-full max-w-md mb-4 rounded overflow-hidden shadow-md">
+            <input
+              type="text"
+              placeholder="Enter a Wallet Address"
+              value={address}
+              onChange={handleInputChange}
+              className="w-full py-2 px-4 bg-white focus:outline-none text-gray-900 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          {/* Buttons to trigger various actions */}
+          <div className="mt-5">
+          <button
+            onClick={handleDisplayRecentTransactions}
+            disabled={isLoadingTransactions}
+            className={`bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${isLoadingTransactions ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {isLoadingTransactions ? 'Loading...' : 'Display Recent Transactions'}
+          </button>
+          </div>
+          <div className="mt-5">
+            <button
+              onClick={handleDownloadClick}
+              className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
+              Download Transactions as CSV
+            </button>
+          </div>
+          <div className="mt-5">
+            <button
+              onClick={handleAttestationDownload}
+              className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
+              Download Attestations as CSV
+            </button>
+          </div>
+          {/* Section to display fetched transactions */}
+          {showTransactions && recentTransactions.length > 0 && (
+            <div className="mt-5 w-full max-w-xl overflow-auto" style={{ maxHeight: '300px', position: 'relative' }}>
+              <h3 className="text-lg font-semibold sticky top-0 bg-white p-2 flex justify-between items-center" style={{ zIndex: 1 }}>
+                <span>Recent Transactions</span>
+                <button
+                  onClick={handleHideTransactions}
+                  className="bg-[#0d577c] hover:bg-[#10a8b6] text-white font-bold py-2 px-4 rounded-md ml-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  Collapse Transactions
+                </button>
+              </h3>
+              <div className="p-2 bg-white overflow-y-auto" style={{ border: '1px solid #e2e8f0', borderRadius: '8px', marginTop: '32px' }}>
+                {recentTransactions.map((transaction, index) => (
+                  <div key={index} className="mt-2 border-b border-gray-200 pb-2">
+                    <p><strong>Hash:</strong> {transaction.hash}</p>
+                    <p><strong>Method ID:</strong> {transaction.input.startsWith('0x') && transaction.input.length >= 10 ? transaction.input.substring(0, 10) : 'N/A'}</p>
+                    <p><strong>From:</strong> {transaction.from}</p>
+                    <p><strong>To:</strong> {transaction.to}</p>
+                    <p><strong>Value:</strong> {Number(transaction.value) / 1e18} ETH</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+  );
+  
+  
 };
 
 export default Home;
