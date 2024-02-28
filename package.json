@@ -1,41 +1,33 @@
 {
-  "name": "moonvault",
-  "homepage": "",
+  "name": "my-app",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "@moonup/moon-sdk": "^1.0.0",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "alchemy-sdk": "^3.1.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
-  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "dependencies": {
+    "@apollo/client": "^3.9.5",
+    "@apollo/sandbox": "^2.5.1",
+    "@apollo/server": "^4.10.0",
+    "@moonup/moon-sdk": "^1.0.0",
+    "graphql": "^16.8.1",
+    "next": "latest",
+    "next-pwa": "^5.6.0",
+    "react": "^18",
+    "react-dom": "^18"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "@types/react": "^18.2.56",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10",
+    "eslint": "^8",
+    "eslint-config-next": "*",
+    "postcss": "^8",
+    "tailwindcss": "^3",
+    "typescript": "^5.3.3"
   }
 }
